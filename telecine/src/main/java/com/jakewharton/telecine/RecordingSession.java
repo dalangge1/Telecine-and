@@ -5,8 +5,10 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.hardware.display.VirtualDisplay;
+import android.media.CamcorderProfile;
 import android.media.MediaMetadataRetriever;
 import android.media.MediaRecorder;
 import android.media.MediaScannerConnection;
@@ -157,9 +159,23 @@ final class RecordingSession {
     Timber.d("Video size: %s%%", sizePercentage);
 
     DisplayMetrics displayMetrics = context.getResources().getDisplayMetrics();
-    int displayHeight = displayMetrics.heightPixels * sizePercentage / 100;
-    int displayWidth = displayMetrics.widthPixels * sizePercentage / 100;
+    Configuration configuration = context.getResources().getConfiguration();
+
+    // Get the best quality available
+    CamcorderProfile camcorderProfile = CamcorderProfile.get(CamcorderProfile.QUALITY_HIGH);
+
+    // We need to check the orientation because the videoFrameWidth and videoFrameHeight
+    // are in landscape mode
+    int videoWidth = configuration.orientation == Configuration.ORIENTATION_LANDSCAPE ?
+            camcorderProfile.videoFrameWidth: camcorderProfile.videoFrameHeight;
+    int videoHeight = configuration.orientation == Configuration.ORIENTATION_LANDSCAPE ?
+            camcorderProfile.videoFrameHeight : camcorderProfile.videoFrameWidth;
+
+    int displayHeight = videoHeight * sizePercentage / 100;
+    int displayWidth = videoWidth * sizePercentage / 100;
     int displayDpi = displayMetrics.densityDpi;
+
+    Timber.d("Video dimensions, width: %s, height: %s", displayWidth, displayHeight);
 
     recorder = new MediaRecorder();
     recorder.setVideoSource(SURFACE);
