@@ -177,7 +177,7 @@ final class RecordingSession {
       maximumHeight = isLandscape ? frameHeight : frameWidth;
 
       // Check if video recording quality is higher than the screen resolution
-      if(maximumWidth > displayMetrics.widthPixels && maximumHeight > displayMetrics.heightPixels) {
+      if(maximumWidth >= displayMetrics.widthPixels && maximumHeight >= displayMetrics.heightPixels) {
         maximumWidth = displayMetrics.widthPixels;
         maximumHeight = displayMetrics.heightPixels;
       } else {
