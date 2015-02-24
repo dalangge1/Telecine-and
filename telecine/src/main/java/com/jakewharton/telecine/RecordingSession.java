@@ -253,8 +253,8 @@ final class RecordingSession {
     shareIntent.putExtra(Intent.EXTRA_STREAM, uri);
     PendingIntent pendingShareIntent = PendingIntent.getActivity(context, 0, shareIntent, 0);
 
-    String title = "Screen recording captured.";
-    String subtitle = "Touch to view your screen recording.";
+    String title = context.getResources().getString(R.string.notification_title);
+    String subtitle = context.getResources().getString(R.string.notification_subtitle);
     Notification.Builder builder = new Notification.Builder(context) //
         .setContentTitle(title)
         .setContentText(subtitle)
@@ -264,7 +264,8 @@ final class RecordingSession {
         .setColor(context.getResources().getColor(R.color.primary_normal))
         .setContentIntent(pendingViewIntent)
         .setAutoCancel(true)
-        .addAction(R.drawable.ic_share_white_24dp, "Share", pendingShareIntent);
+        .addAction(R.drawable.ic_share_white_24dp,
+                context.getResources().getString(R.string.notification_share), pendingShareIntent);
 
     if (bitmap != null) {
       builder.setLargeIcon(createSquareBitmap(bitmap)) //
