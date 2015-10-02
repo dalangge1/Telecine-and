@@ -152,9 +152,9 @@ final class RecordingSession {
             .setDuration(0)
             .withEndAction(new Runnable() {
               @Override
-                public void run() {
-                  takeScreenshot();
-                }
+              public void run() {
+                takeScreenshot();
+              }
             });
       }
     };
