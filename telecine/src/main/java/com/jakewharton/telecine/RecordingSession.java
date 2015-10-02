@@ -93,7 +93,7 @@ final class RecordingSession {
   private final DateFormat videofileFormat =
       new SimpleDateFormat("'Telecine_'yyyy-MM-dd-HH-mm-ss'.mp4'", Locale.US);
   private final DateFormat audiofileFormat =
-          new SimpleDateFormat("'Telecine_'yyyy-MM-dd-HH-mm-ss'.jpeg'", Locale.US);
+      new SimpleDateFormat("'Telecine_'yyyy-MM-dd-HH-mm-ss'.jpeg'", Locale.US);
 
   private final NotificationManager notificationManager;
   private final WindowManager windowManager;
@@ -343,7 +343,7 @@ final class RecordingSession {
 
     final RecordingInfo recordingInfo = getScreenshotInfo();
     Timber.d("Screenshot: %s x %s @ %s", recordingInfo.width, recordingInfo.height,
-            recordingInfo.density);
+        recordingInfo.density);
 
     String outputName = audiofileFormat.format(new Date());
     outputFile = new File(picturesOutputRoot, outputName).getAbsolutePath();
@@ -354,8 +354,8 @@ final class RecordingSession {
     imageReader = ImageReader.newInstance(recordingInfo.width, recordingInfo.height, PixelFormat.RGBA_8888, 2);
     Surface surface = imageReader.getSurface();
     display =
-            projection.createVirtualDisplay(DISPLAY_NAME, recordingInfo.width, recordingInfo.height,
-                    recordingInfo.density, VIRTUAL_DISPLAY_FLAG_PRESENTATION, surface, null, null);
+        projection.createVirtualDisplay(DISPLAY_NAME, recordingInfo.width, recordingInfo.height,
+            recordingInfo.density, VIRTUAL_DISPLAY_FLAG_PRESENTATION, surface, null, null);
 
 
     imageReader.setOnImageAvailableListener(new ImageReader.OnImageAvailableListener() {

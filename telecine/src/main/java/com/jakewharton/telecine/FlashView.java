@@ -18,7 +18,6 @@ import static android.view.WindowManager.LayoutParams.TYPE_SYSTEM_ERROR;
 @SuppressLint("ViewConstructor") // Lint, in this case, I am smarter than you.
 final class FlashView extends FrameLayout {
 
-    private FlashView flashView;
     private final Listener listener;
 
     static FlashView create(Context context, Listener listener) {
