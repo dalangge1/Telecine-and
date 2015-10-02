@@ -148,15 +148,14 @@ final class RecordingSession {
 
       @Override public void onScreenshot() {
         overlayView.animate()
-                .alpha(0)
-                .setDuration(0)
-                .withEndAction(new Runnable() {
-                  @Override
-                  public void run() {
-                    takeScreenshot();
-                  }
-                });
-
+            .alpha(0)
+            .setDuration(0)
+            .withEndAction(new Runnable() {
+              @Override
+                public void run() {
+                  takeScreenshot();
+                }
+            });
       }
     };
     overlayView = OverlayView.create(context, overlayListener, showCountDown.get());
@@ -279,9 +278,9 @@ final class RecordingSession {
     Timber.d("Screen recording started.");
 
     analytics.send(new HitBuilders.EventBuilder() //
-            .setCategory(Analytics.CATEGORY_RECORDING)
-            .setAction(Analytics.ACTION_RECORDING_START)
-            .build());
+        .setCategory(Analytics.CATEGORY_RECORDING)
+        .setAction(Analytics.ACTION_RECORDING_START)
+        .build());
   }
 
   private void stopRecording() {
@@ -407,18 +406,18 @@ final class RecordingSession {
 
             Timber.d("Screenshot taken. Notifying media scanner of new screenshot.");
             MediaScannerConnection.scanFile(context, new String[]{outputFile}, null,
-                    new MediaScannerConnection.OnScanCompletedListener() {
+                new MediaScannerConnection.OnScanCompletedListener() {
+                  @Override
+                  public void onScanCompleted(String path, final Uri uri) {
+                    Timber.d("Media scanner completed.");
+                    mainThread.post(new Runnable() {
                       @Override
-                      public void onScanCompleted(String path, final Uri uri) {
-                        Timber.d("Media scanner completed.");
-                        mainThread.post(new Runnable() {
-                          @Override
-                          public void run() {
-                            showScreenshotNotification(uri, null);
-                          }
-                        });
-                      }
-                    });
+                        public void run() {
+                          showScreenshotNotification(uri, null);
+                        }
+                      });
+                    }
+                  });
           }
 
         } catch (Exception e) {
@@ -450,13 +449,13 @@ final class RecordingSession {
           projection.stop();
 
           overlayView.animate()
-                  .alpha(1)
-                  .setDuration(0);
+              .alpha(1)
+              .setDuration(0);
 
           analytics.send(new HitBuilders.EventBuilder() //
-                  .setCategory(Analytics.CATEGORY_SCREENSHOT)
-                  .setAction(Analytics.ACTION_SCREENSHOT_TAKEN)
-                  .build());
+              .setCategory(Analytics.CATEGORY_SCREENSHOT)
+              .setAction(Analytics.ACTION_SCREENSHOT_TAKEN)
+              .build());
 
           Timber.d("Screenshot success");
         }
