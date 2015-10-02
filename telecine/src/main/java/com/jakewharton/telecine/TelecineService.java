@@ -72,6 +72,10 @@ public final class TelecineService extends Service {
       stopForeground(true /* remove notification */);
     }
 
+    @Override public void onScreenshot() {
+
+    }
+
     @Override public void onEnd() {
       Timber.d("Shutting down.");
       stopSelf();

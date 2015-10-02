@@ -17,6 +17,8 @@
   <string name="video_size_percentage">Video size</string>
   <string name="notification_captured_title">Screen recording captured.</string>
   <string name="notification_captured_subtitle">Touch to view your screen recording.</string>
+  <string name="notification_screenshot_captured_title">Screenshot captured.</string>
+  <string name="notification_screenshot_captured_subtitle">Touch to view your screenshot.</string>
   <string name="notification_captured_share">Share</string>
   <string name="notification_captured_delete">Delete</string>
   <string name="notification_recording_title">Recording screen.</string>
