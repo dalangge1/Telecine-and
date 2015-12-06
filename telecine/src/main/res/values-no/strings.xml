@@ -4,9 +4,6 @@
   <string name="shortcut_name">Start</string>
   <string name="clear">Slett</string>
   <string name="record">Ta opp</string>
-  <string name="countdown_one">1…</string>
-  <string name="countdown_two">2…</string>
-  <string name="countdown_three">3…</string>
   <string name="launch_overlay">Start overlay</string>
   <string name="preferences">Innstillinger</string>
   <string name="countdown">Tre sekunds nedtelling</string>
@@ -20,10 +17,4 @@
   <string name="notification_recording_subtitle">Trykk på klokkeområdet for å stoppe opptak.</string>
   <string name="recording_notification">Opptaksvarsel</string>
   <string name="show_touches">Vis trykk på skjerm</string>
-
-  <array name="countdown">
-    <item>@string/countdown_three</item>
-    <item>@string/countdown_two</item>
-    <item>@string/countdown_one</item>
-  </array>
 </resources>
