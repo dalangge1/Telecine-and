@@ -9,8 +9,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
+import android.graphics.PixelFormat;
 import android.hardware.display.VirtualDisplay;
 import android.media.CamcorderProfile;
+import android.media.Image;
+import android.media.ImageReader;
 import android.media.MediaMetadataRetriever;
 import android.media.MediaRecorder;
 import android.media.MediaScannerConnection;
@@ -21,6 +24,7 @@ import android.os.AsyncTask;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
+import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.DisplayMetrics;
@@ -28,7 +32,9 @@ import android.view.Surface;
 import android.view.WindowManager;
 import com.google.android.gms.analytics.HitBuilders;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -48,13 +54,15 @@ import static android.hardware.display.DisplayManager.VIRTUAL_DISPLAY_FLAG_PRESE
 import static android.media.MediaRecorder.OutputFormat.MPEG_4;
 import static android.media.MediaRecorder.VideoEncoder.H264;
 import static android.media.MediaRecorder.VideoSource.SURFACE;
+import static android.os.Environment.DIRECTORY_DCIM;
 import static android.os.Environment.DIRECTORY_MOVIES;
 
 final class RecordingSession {
   static final int NOTIFICATION_ID = 522592;
 
   private static final String DISPLAY_NAME = "telecine";
-  private static final String MIME_TYPE = "video/mp4";
+  private static final String MIME_TYPE_RECORDING = "video/mp4";
+  private static final String MIME_TYPE_SCREENSHOT = "image/jpeg";
 
   interface Listener {
     /** Invoked immediately prior to the start of recording. */
@@ -65,6 +73,9 @@ final class RecordingSession {
 
     /** Invoked after all work for this session has completed. */
     void onEnd();
+
+    /**Invoked immediately prior to the start of screenshot. */
+    void onScreenshot();
   }
 
   private final Handler mainThread = new Handler(Looper.getMainLooper());
@@ -78,16 +89,21 @@ final class RecordingSession {
   private final Provider<Boolean> showCountDown;
   private final Provider<Integer> videoSizePercentage;
 
-  private final File outputRoot;
-  private final DateFormat fileFormat =
+  private final File videoOutputRoot;
+  private final File picturesOutputRoot;
+  private final DateFormat videofileFormat =
       new SimpleDateFormat("'Telecine_'yyyy-MM-dd-HH-mm-ss'.mp4'", Locale.US);
+  private final DateFormat audiofileFormat =
+      new SimpleDateFormat("'Telecine_'yyyy-MM-dd-HH-mm-ss'.jpeg'", Locale.US);
 
   private final NotificationManager notificationManager;
   private final WindowManager windowManager;
   private final MediaProjectionManager projectionManager;
 
   private OverlayView overlayView;
+  private FlashView flashView;
   private MediaRecorder recorder;
+  private ImageReader imageReader;
   private MediaProjection projection;
   private VirtualDisplay display;
   private String outputFile;
@@ -105,8 +121,10 @@ final class RecordingSession {
     this.showCountDown = showCountDown;
     this.videoSizePercentage = videoSizePercentage;
 
-    File picturesDir = Environment.getExternalStoragePublicDirectory(DIRECTORY_MOVIES);
-    outputRoot = new File(picturesDir, "Telecine");
+    File moviesDir = Environment.getExternalStoragePublicDirectory(DIRECTORY_MOVIES);
+    videoOutputRoot = new File(moviesDir, "Telecine");
+    File picturesDir = Environment.getExternalStoragePublicDirectory(DIRECTORY_DCIM);
+    picturesOutputRoot = new File(picturesDir, "Telecine");
 
     notificationManager = (NotificationManager) context.getSystemService(NOTIFICATION_SERVICE);
     windowManager = (WindowManager) context.getSystemService(WINDOW_SERVICE);
@@ -127,6 +145,18 @@ final class RecordingSession {
 
       @Override public void onStop() {
         stopRecording();
+      }
+
+      @Override public void onScreenshot() {
+        overlayView.animate()
+            .alpha(0)
+            .setDuration(0)
+            .withEndAction(new Runnable() {
+              @Override
+              public void run() {
+                takeScreenshot();
+              }
+            });
       }
     };
     overlayView = OverlayView.create(context, overlayListener, showCountDown.get());
@@ -188,11 +218,27 @@ final class RecordingSession {
         cameraWidth, cameraHeight, cameraFrameRate, sizePercentage);
   }
 
+  private RecordingInfo getScreenshotInfo() {
+    DisplayMetrics displayMetrics = new DisplayMetrics();
+    WindowManager wm = (WindowManager) context.getSystemService(WINDOW_SERVICE);
+    wm.getDefaultDisplay().getRealMetrics(displayMetrics);
+    int displayWidth = displayMetrics.widthPixels;
+    int displayHeight = displayMetrics.heightPixels;
+    int displayDensity = displayMetrics.densityDpi;
+    Timber.d("Display size: %s x %s @ %s", displayWidth, displayHeight, displayDensity);
+
+    Configuration configuration = context.getResources().getConfiguration();
+    boolean isLandscape = configuration.orientation == ORIENTATION_LANDSCAPE;
+    Timber.d("Display landscape: %s", isLandscape);
+
+    return new RecordingInfo(displayWidth, displayHeight, displayDensity);
+  }
+
   private void startRecording() {
     Timber.d("Starting screen recording...");
 
-    if (!outputRoot.mkdirs()) {
-      Timber.e("Unable to create output directory '%s'.", outputRoot.getAbsolutePath());
+    if (!videoOutputRoot.mkdirs()) {
+      Timber.e("Unable to create output directory '%s'.", videoOutputRoot.getAbsolutePath());
       // We're probably about to crash, but at least the log will indicate as to why.
     }
 
@@ -208,8 +254,8 @@ final class RecordingSession {
     recorder.setVideoSize(recordingInfo.width, recordingInfo.height);
     recorder.setVideoEncodingBitRate(8 * 1000 * 1000);
 
-    String outputName = fileFormat.format(new Date());
-    outputFile = new File(outputRoot, outputName).getAbsolutePath();
+    String outputName = videofileFormat.format(new Date());
+    outputFile = new File(videoOutputRoot, outputName).getAbsolutePath();
     Timber.i("Output file '%s'.", outputFile);
     recorder.setOutputFile(outputFile);
 
@@ -287,13 +333,145 @@ final class RecordingSession {
         });
   }
 
+  private void takeScreenshot() {
+    Timber.d("Start screenshot");
+
+
+
+    if (!picturesOutputRoot.mkdirs()) {
+      Timber.e("Unable to create output directory '%s'.", picturesOutputRoot.getAbsolutePath());
+      // We're probably about to crash, but at least the log will indicate as to why.
+    }
+
+    final RecordingInfo recordingInfo = getScreenshotInfo();
+    Timber.d("Screenshot: %s x %s @ %s", recordingInfo.width, recordingInfo.height,
+        recordingInfo.density);
+
+    String outputName = audiofileFormat.format(new Date());
+    outputFile = new File(picturesOutputRoot, outputName).getAbsolutePath();
+    Timber.i("Output file '%s'.", outputFile);
+
+    projection = projectionManager.getMediaProjection(resultCode, data);
+
+    imageReader = ImageReader.newInstance(recordingInfo.width, recordingInfo.height, PixelFormat.RGBA_8888, 2);
+    Surface surface = imageReader.getSurface();
+    display =
+        projection.createVirtualDisplay(DISPLAY_NAME, recordingInfo.width, recordingInfo.height,
+            recordingInfo.density, VIRTUAL_DISPLAY_FLAG_PRESENTATION, surface, null, null);
+
+
+    imageReader.setOnImageAvailableListener(new ImageReader.OnImageAvailableListener() {
+      @Override
+      public void onImageAvailable(ImageReader reader) {
+        Timber.d("ImageReader: Image available");
+        Image image = null;
+        FileOutputStream fos = null;
+        Bitmap bitmap = null;
+        Bitmap croppedBitmap = null;
+
+        try {
+          image = imageReader.acquireLatestImage();
+          if (image != null) {
+
+            FlashView.Listener flashViewListener = new FlashView.Listener() {
+              @Override
+              public void onFlashComplete() {
+                if (flashView != null) {
+                  windowManager.removeView(flashView);
+                  flashView = null;
+                }
+
+              }
+            };
+            flashView = FlashView.create(context, flashViewListener);
+            windowManager.addView(flashView, FlashView.createLayoutParams());
+
+            Image.Plane[] planes = image.getPlanes();
+            ByteBuffer buffer = planes[0].getBuffer();
+            int pixelStride = planes[0].getPixelStride();
+            int rowStride = planes[0].getRowStride();
+            int rowPadding = rowStride - pixelStride * recordingInfo.width;
+
+            // create bitmap
+            bitmap = Bitmap.createBitmap(recordingInfo.width + rowPadding / pixelStride, recordingInfo.height, Bitmap.Config.ARGB_8888);
+            bitmap.copyPixelsFromBuffer(buffer);
+
+            //Trimming the bitmap to the w/h of the screen. For some reason, image reader adds more pixels to width.
+            croppedBitmap = Bitmap.createBitmap(bitmap, 0, 0, recordingInfo.width, recordingInfo.height);
+
+            bitmap.recycle();
+            bitmap = null;
+
+            // write bitmap to a file
+            fos = new FileOutputStream(outputFile);
+            croppedBitmap.compress(Bitmap.CompressFormat.JPEG, 100, fos);
+
+            Timber.d("Screenshot taken. Notifying media scanner of new screenshot.");
+            MediaScannerConnection.scanFile(context, new String[]{outputFile}, null,
+                new MediaScannerConnection.OnScanCompletedListener() {
+                  @Override
+                  public void onScanCompleted(String path, final Uri uri) {
+                    Timber.d("Media scanner completed.");
+                    mainThread.post(new Runnable() {
+                      @Override
+                        public void run() {
+                          showScreenshotNotification(uri, null);
+                        }
+                      });
+                    }
+                  });
+          }
+
+        } catch (Exception e) {
+          e.printStackTrace();
+          Timber.e("Error converting image to jpeg");
+        } finally {
+          if (fos != null) {
+            try {
+              fos.close();
+            } catch (IOException ioe) {
+              ioe.printStackTrace();
+            }
+          }
+
+          if (bitmap != null) {
+            bitmap.recycle();
+          }
+
+          if (croppedBitmap != null) {
+            croppedBitmap.recycle();
+          }
+
+          if (image != null) {
+            image.close();
+          }
+
+          imageReader.close();
+          display.release();
+          projection.stop();
+
+          overlayView.animate()
+              .alpha(1)
+              .setDuration(0);
+
+          analytics.send(new HitBuilders.EventBuilder() //
+              .setCategory(Analytics.CATEGORY_SCREENSHOT)
+              .setAction(Analytics.ACTION_SCREENSHOT_TAKEN)
+              .build());
+
+          Timber.d("Screenshot success");
+        }
+      }
+    }, null);
+  }
+
   private void showNotification(final Uri uri, Bitmap bitmap) {
     Intent viewIntent = new Intent(ACTION_VIEW, uri);
     PendingIntent pendingViewIntent =
         PendingIntent.getActivity(context, 0, viewIntent, FLAG_CANCEL_CURRENT);
 
     Intent shareIntent = new Intent(ACTION_SEND);
-    shareIntent.setType(MIME_TYPE);
+    shareIntent.setType(MIME_TYPE_RECORDING);
     shareIntent.putExtra(Intent.EXTRA_STREAM, uri);
     shareIntent = Intent.createChooser(shareIntent, null);
     PendingIntent pendingShareIntent =
@@ -345,6 +523,72 @@ final class RecordingSession {
       @Override protected void onPostExecute(@Nullable Bitmap bitmap) {
         if (bitmap != null) {
           showNotification(uri, bitmap);
+        } else {
+          listener.onEnd();
+        }
+      }
+    }.execute();
+  }
+
+  private void showScreenshotNotification(final Uri uri, final Bitmap bitmap) {
+    Intent viewIntent = new Intent(ACTION_VIEW, uri);
+    PendingIntent pendingViewIntent = PendingIntent.getActivity(context, 0, viewIntent, 0);
+
+    Intent shareIntent = new Intent(ACTION_SEND);
+    shareIntent.setType(MIME_TYPE_SCREENSHOT);
+    shareIntent.putExtra(Intent.EXTRA_STREAM, uri);
+    shareIntent = Intent.createChooser(shareIntent, null);
+    PendingIntent pendingShareIntent = PendingIntent.getActivity(context, 0, shareIntent, 0);
+
+    Intent deleteIntent = new Intent(context, DeleteRecordingBroadcastReceiver.class);
+    deleteIntent.setData(uri);
+    PendingIntent pendingDeleteIntent = PendingIntent.getBroadcast(context, 0, deleteIntent, 0);
+
+    CharSequence title = context.getText(R.string.notification_screenshot_captured_title);
+    CharSequence subtitle = context.getText(R.string.notification_screenshot_captured_subtitle);
+    CharSequence share = context.getText(R.string.notification_captured_share);
+    CharSequence delete = context.getText(R.string.notification_captured_delete);
+    Notification.Builder builder = new Notification.Builder(context) //
+        .setContentTitle(title)
+        .setContentText(subtitle)
+        .setWhen(System.currentTimeMillis())
+        .setShowWhen(true)
+        .setSmallIcon(R.drawable.ic_camera_alt_white_24dp)
+        .setColor(context.getResources().getColor(R.color.primary_normal))
+        .setContentIntent(pendingViewIntent)
+        .setAutoCancel(true)
+        .addAction(R.drawable.ic_share_white_24dp, share, pendingShareIntent)
+        .addAction(R.drawable.ic_delete_white_24dp, delete, pendingDeleteIntent);
+
+    if (bitmap != null) {
+      builder.setLargeIcon(createSquareBitmap(bitmap))
+          .setStyle(new Notification.BigPictureStyle() //
+          .setBigContentTitle(title) //
+          .setSummaryText(subtitle) //
+          .bigPicture(bitmap));
+    }
+
+    notificationManager.notify(NOTIFICATION_ID, builder.build());
+
+    if (bitmap != null) {
+      listener.onEnd();
+      return;
+    }
+
+    new AsyncTask<Void, Void, Bitmap>() {
+      @Override protected Bitmap doInBackground(@NonNull Void... none) {
+        Bitmap bitmap = null;
+        try {
+          bitmap = MediaStore.Images.Media.getBitmap(context.getContentResolver(), uri);
+        } catch (Exception e) {
+          Timber.d("Failed to create bitmap from screenshot file.");
+        }
+        return bitmap;
+      }
+
+      @Override protected void onPostExecute(@Nullable Bitmap bitmap) {
+        if (bitmap != null) {
+          showScreenshotNotification(uri, bitmap);
         } else {
           listener.onEnd();
         }

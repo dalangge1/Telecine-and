@@ -18,6 +18,15 @@
         android:contentDescription="@string/clear"
         />
     <ImageButton
+        android:id="@+id/record_overlay_screenshot"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:src="@drawable/ic_camera_alt_white_24dp"
+        android:background="@drawable/screenshot_background"
+        android:contentDescription="@string/clear"
+        />
+    <ImageButton
         android:id="@+id/record_overlay_start"
         android:layout_width="0dp"
         android:layout_height="match_parent"

@@ -6,6 +6,7 @@ import java.util.Map;
 interface Analytics {
   String CATEGORY_SETTINGS = "Settings";
   String CATEGORY_RECORDING = "Recording";
+  String CATEGORY_SCREENSHOT = "Screenshot";
   String CATEGORY_SHORTCUT = "Shortcut";
 
   String ACTION_CAPTURE_INTENT_LAUNCH = "Launch Overlay Launch";
@@ -20,6 +21,7 @@ interface Analytics {
   String ACTION_OVERLAY_CANCEL = "Overlay Cancel";
   String ACTION_RECORDING_START = "Recording Start";
   String ACTION_RECORDING_STOP = "Recording Stop";
+  String ACTION_SCREENSHOT_TAKEN = "Screenshot Taken";
   String ACTION_SHORTCUT_ADDED = "Shortcut Added";
   String ACTION_SHORTCUT_LAUNCHED = "Shortcut Launched";
 

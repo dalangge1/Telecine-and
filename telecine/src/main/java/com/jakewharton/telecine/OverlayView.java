@@ -79,6 +79,11 @@ final class OverlayView extends FrameLayout {
 
     /** Called when stop is clicked. This view is unusable once this callback is invoked. */
     void onStop();
+
+    void onScreenshot();
+    /** Called when screenshot is clicked. This view will hide itself completely before invoking
+     * this callback. It will reappear once the screenshot has been saved.
+     */
   }
 
   @Bind(R.id.record_overlay_buttons) View buttonsView;
@@ -149,6 +154,10 @@ final class OverlayView extends FrameLayout {
         }
       }
     }, showCountDown ? COUNTDOWN_DELAY : NON_COUNTDOWN_DELAY);
+  }
+
+  @OnClick(R.id.record_overlay_screenshot) void onScreenshotClicked() {
+    listener.onScreenshot();
   }
 
   private void startRecording() {
