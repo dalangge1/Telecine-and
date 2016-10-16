@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.os.IBinder;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
+import java.util.concurrent.atomic.AtomicBoolean;
 import timber.log.Timber;
 
 import javax.inject.Inject;
@@ -35,6 +36,8 @@ public final class TelecineService extends Service {
 
   @Inject Analytics analytics;
   @Inject ContentResolver contentResolver;
+
+  @Inject @NotificationDismissed AtomicBoolean notificationDismissed;
 
   private boolean running;
   private RecordingSession recordingSession;
@@ -95,7 +98,7 @@ public final class TelecineService extends Service {
 
     recordingSession =
         new RecordingSession(this, listener, resultCode, data, analytics, showCountdownProvider,
-            videoSizePercentageProvider);
+            videoSizePercentageProvider, notificationDismissed);
     recordingSession.showOverlay();
 
     return START_NOT_STICKY;

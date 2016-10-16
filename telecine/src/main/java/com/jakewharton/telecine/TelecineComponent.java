@@ -12,4 +12,6 @@ interface TelecineComponent {
 
   void inject(TelecineService service);
   void inject(TelecineTileService service);
+
+  void inject(DismissNotificationBroadcastReceiver receiver);
 }

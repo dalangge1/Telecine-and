@@ -33,6 +33,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 import javax.inject.Provider;
 import timber.log.Timber;
 
@@ -94,8 +95,11 @@ final class RecordingSession {
   private boolean running;
   private long recordingStartNanos;
 
+  final AtomicBoolean notificationDismissed;
+
   RecordingSession(Context context, Listener listener, int resultCode, Intent data,
-      Analytics analytics, Provider<Boolean> showCountDown, Provider<Integer> videoSizePercentage) {
+      Analytics analytics, Provider<Boolean> showCountDown, Provider<Integer> videoSizePercentage,
+      AtomicBoolean notificationDismissed) {
     this.context = context;
     this.listener = listener;
     this.resultCode = resultCode;
@@ -104,6 +108,8 @@ final class RecordingSession {
 
     this.showCountDown = showCountDown;
     this.videoSizePercentage = videoSizePercentage;
+
+    this.notificationDismissed = notificationDismissed;
 
     File picturesDir = Environment.getExternalStoragePublicDirectory(DIRECTORY_MOVIES);
     outputRoot = new File(picturesDir, "Telecine");
@@ -311,6 +317,10 @@ final class RecordingSession {
     PendingIntent pendingViewIntent =
         PendingIntent.getActivity(context, 0, viewIntent, FLAG_CANCEL_CURRENT);
 
+    Intent dismissIntent = new Intent(context, DismissNotificationBroadcastReceiver.class);
+    PendingIntent pendingDismissIntent =
+        PendingIntent.getBroadcast(context, 0, dismissIntent, FLAG_CANCEL_CURRENT);
+
     Intent shareIntent = new Intent(ACTION_SEND);
     shareIntent.setType(MIME_TYPE);
     shareIntent.putExtra(Intent.EXTRA_STREAM, uri);
@@ -335,6 +345,7 @@ final class RecordingSession {
         .setSmallIcon(R.drawable.ic_videocam_white_24dp)
         .setColor(context.getResources().getColor(R.color.primary_normal))
         .setContentIntent(pendingViewIntent)
+        .setDeleteIntent(pendingDismissIntent)
         .setAutoCancel(true)
         .addAction(R.drawable.ic_share_white_24dp, share, pendingShareIntent)
         .addAction(R.drawable.ic_delete_white_24dp, delete, pendingDeleteIntent);
@@ -347,6 +358,7 @@ final class RecordingSession {
               .bigPicture(bitmap));
     }
 
+    notificationDismissed.set(false);
     notificationManager.notify(NOTIFICATION_ID, builder.build());
 
     if (bitmap != null) {
@@ -362,7 +374,7 @@ final class RecordingSession {
       }
 
       @Override protected void onPostExecute(@Nullable Bitmap bitmap) {
-        if (bitmap != null) {
+        if (bitmap != null && !notificationDismissed.get()) {
           showNotification(uri, bitmap);
         } else {
           listener.onEnd();
