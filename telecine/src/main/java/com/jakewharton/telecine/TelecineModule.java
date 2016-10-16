@@ -6,10 +6,10 @@ import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.analytics.Tracker;
 import dagger.Module;
 import dagger.Provides;
-import timber.log.Timber;
-
-import javax.inject.Singleton;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
+import javax.inject.Singleton;
+import timber.log.Timber;
 
 import static android.content.Context.MODE_PRIVATE;
 
@@ -92,5 +92,9 @@ final class TelecineModule {
   @Provides @VideoSizePercentage Integer provideVideoSizePercentage(
       @VideoSizePercentage IntPreference pref) {
     return pref.get();
+  }
+
+  @Provides @Singleton @NotificationDismissed AtomicBoolean provideNotificationDismissed() {
+    return new AtomicBoolean(false);
   }
 }
