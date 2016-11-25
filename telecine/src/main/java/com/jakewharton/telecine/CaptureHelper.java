@@ -3,7 +3,6 @@ package com.jakewharton.telecine;
 import android.app.Activity;
 import android.content.Intent;
 import android.media.projection.MediaProjectionManager;
-import com.google.android.gms.analytics.HitBuilders;
 import timber.log.Timber;
 
 import static android.content.Context.MEDIA_PROJECTION_SERVICE;
@@ -21,10 +20,7 @@ final class CaptureHelper {
     Intent intent = manager.createScreenCaptureIntent();
     activity.startActivityForResult(intent, CREATE_SCREEN_CAPTURE);
 
-    analytics.send(new HitBuilders.EventBuilder() //
-        .setCategory(Analytics.CATEGORY_SETTINGS)
-        .setAction(Analytics.ACTION_CAPTURE_INTENT_LAUNCH)
-        .build());
+    analytics.send(Analytics.EVENT_CAPTURE_INTENT_LAUNCH);
   }
 
   static boolean handleActivityResult(Activity activity, int requestCode, int resultCode,
@@ -40,11 +36,7 @@ final class CaptureHelper {
       Timber.d("Failed to acquire permission to screen capture.");
     }
 
-    analytics.send(new HitBuilders.EventBuilder() //
-        .setCategory(Analytics.CATEGORY_SETTINGS)
-        .setAction(Analytics.ACTION_CAPTURE_INTENT_RESULT)
-        .setValue(resultCode)
-        .build());
+    analytics.send(Analytics.EVENT_CAPTURE_INTENT_RESULT + resultCode);
 
     return true;
   }

@@ -2,14 +2,12 @@ package com.jakewharton.telecine;
 
 import android.content.ContentResolver;
 import android.content.SharedPreferences;
-import com.google.android.gms.analytics.GoogleAnalytics;
-import com.google.android.gms.analytics.Tracker;
+import com.google.firebase.analytics.FirebaseAnalytics;
 import dagger.Module;
 import dagger.Provides;
 import timber.log.Timber;
 
 import javax.inject.Singleton;
-import java.util.Map;
 
 import static android.content.Context.MODE_PRIVATE;
 
@@ -31,16 +29,17 @@ final class TelecineModule {
   @Provides @Singleton Analytics provideAnalytics() {
     if (BuildConfig.DEBUG) {
       return new Analytics() {
-        @Override public void send(Map<String, String> params) {
-          Timber.tag("Analytics").d(String.valueOf(params));
+        @Override
+        public void send(String name) {
+          Timber.tag("Analytics").d(name);
+        }
+        @Override
+        public void send(String name, long value) {
+          Timber.tag("Analytics").d(name + "=" + value);
         }
       };
     }
-
-    GoogleAnalytics googleAnalytics = GoogleAnalytics.getInstance(app);
-    Tracker tracker = googleAnalytics.newTracker(BuildConfig.ANALYTICS_KEY);
-    tracker.setSessionTimeout(300); // ms? s? better be s.
-    return new Analytics.GoogleAnalytics(tracker);
+    return new Analytics.FirebaseAnalyticsImpl(FirebaseAnalytics.getInstance(app));
   }
 
   @Provides @Singleton ContentResolver provideContentResolver() {

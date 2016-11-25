@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import com.google.android.gms.analytics.HitBuilders;
 import javax.inject.Inject;
 
 public final class TelecineShortcutLaunchActivity extends Activity {
@@ -12,7 +11,7 @@ public final class TelecineShortcutLaunchActivity extends Activity {
 
   static Intent createQuickTileIntent(Context context) {
     Intent intent = new Intent(context, TelecineShortcutLaunchActivity.class);
-    intent.putExtra(KEY_ACTION, Analytics.ACTION_QUICK_TILE_LAUNCHED);
+    intent.putExtra(KEY_ACTION, Analytics.EVENT_QUICK_TILE_LAUNCHED);
     return intent;
   }
 
@@ -24,13 +23,10 @@ public final class TelecineShortcutLaunchActivity extends Activity {
 
     String launchAction = getIntent().getStringExtra(KEY_ACTION);
     if (launchAction == null) {
-      launchAction = Analytics.ACTION_SHORTCUT_LAUNCHED;
+      launchAction = Analytics.EVENT_SHORTCUT_LAUNCHED;
     }
 
-    analytics.send(new HitBuilders.EventBuilder() //
-        .setCategory(Analytics.CATEGORY_SHORTCUT)
-        .setAction(launchAction)
-        .build());
+    analytics.send(launchAction);
 
     CaptureHelper.fireScreenCaptureIntent(this, analytics);
   }

@@ -25,7 +25,6 @@ import android.util.DisplayMetrics;
 import android.view.Surface;
 import android.view.WindowManager;
 import android.widget.Toast;
-import com.google.android.gms.analytics.HitBuilders;
 import java.io.File;
 import java.io.IOException;
 import java.text.DateFormat;
@@ -138,10 +137,7 @@ final class RecordingSession {
     overlayView = OverlayView.create(context, overlayListener, showCountDown.get());
     windowManager.addView(overlayView, OverlayView.createLayoutParams(context));
 
-    analytics.send(new HitBuilders.EventBuilder() //
-        .setCategory(Analytics.CATEGORY_RECORDING)
-        .setAction(Analytics.ACTION_OVERLAY_SHOW)
-        .build());
+    analytics.send(Analytics.EVENT_OVERLAY_SHOW);
   }
 
   private void hideOverlay() {
@@ -150,10 +146,7 @@ final class RecordingSession {
       windowManager.removeView(overlayView);
       overlayView = null;
 
-      analytics.send(new HitBuilders.EventBuilder() //
-          .setCategory(Analytics.CATEGORY_RECORDING)
-          .setAction(Analytics.ACTION_OVERLAY_HIDE)
-          .build());
+      analytics.send(Analytics.EVENT_OVERLAY_HIDE);
     }
   }
 
@@ -161,10 +154,7 @@ final class RecordingSession {
     hideOverlay();
     listener.onEnd();
 
-    analytics.send(new HitBuilders.EventBuilder() //
-        .setCategory(Analytics.CATEGORY_RECORDING)
-        .setAction(Analytics.ACTION_OVERLAY_CANCEL)
-        .build());
+    analytics.send(Analytics.EVENT_OVERLAY_CANCEL);
   }
 
   private RecordingInfo getRecordingInfo() {
@@ -241,10 +231,7 @@ final class RecordingSession {
 
     Timber.d("Screen recording started.");
 
-    analytics.send(new HitBuilders.EventBuilder() //
-        .setCategory(Analytics.CATEGORY_RECORDING)
-        .setAction(Analytics.ACTION_RECORDING_START)
-        .build());
+    analytics.send(Analytics.EVENT_RECORDING_START);
   }
 
   private void stopRecording() {
@@ -282,15 +269,8 @@ final class RecordingSession {
     recorder.release();
     display.release();
 
-    analytics.send(new HitBuilders.EventBuilder() //
-        .setCategory(Analytics.CATEGORY_RECORDING)
-        .setAction(Analytics.ACTION_RECORDING_STOP)
-        .build());
-    analytics.send(new HitBuilders.TimingBuilder() //
-        .setCategory(Analytics.CATEGORY_RECORDING)
-        .setValue(TimeUnit.NANOSECONDS.toMillis(recordingStopNanos - recordingStartNanos))
-        .setVariable(Analytics.VARIABLE_RECORDING_LENGTH)
-        .build());
+    analytics.send(Analytics.EVENT_RECORDING_STOP);
+    analytics.send(Analytics.EVENT_RECORDING_LENGTH, TimeUnit.NANOSECONDS.toMillis(recordingStopNanos - recordingStartNanos));
 
     Timber.d("Screen recording stopped. Notifying media scanner of new video.");
 

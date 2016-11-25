@@ -3,7 +3,6 @@ package com.jakewharton.telecine;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import com.google.android.gms.analytics.HitBuilders;
 import javax.inject.Inject;
 
 import static android.content.Intent.ShortcutIconResource;
@@ -15,10 +14,7 @@ public final class TelecineShortcutConfigureActivity extends Activity {
     super.onCreate(savedInstanceState);
 
     ((TelecineApplication) getApplication()).injector().inject(this);
-    analytics.send(new HitBuilders.EventBuilder() //
-        .setCategory(Analytics.CATEGORY_SHORTCUT) //
-        .setAction(Analytics.ACTION_SHORTCUT_ADDED) //
-        .build());
+    analytics.send(Analytics.EVENT_SHORTCUT_ADDED);
 
     Intent launchIntent = new Intent(this, TelecineShortcutLaunchActivity.class);
     ShortcutIconResource icon = ShortcutIconResource.fromContext(this, R.drawable.ic_launcher);

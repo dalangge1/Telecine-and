@@ -19,7 +19,6 @@ import butterknife.ButterKnife;
 import butterknife.OnCheckedChanged;
 import butterknife.OnClick;
 import butterknife.OnItemSelected;
-import com.google.android.gms.analytics.HitBuilders;
 import javax.inject.Inject;
 import timber.log.Timber;
 
@@ -101,11 +100,7 @@ public final class TelecineActivity extends AppCompatActivity {
       Timber.d("Video size percentage changing to %s%%", newValue);
       videoSizePreference.set(newValue);
 
-      analytics.send(new HitBuilders.EventBuilder() //
-          .setCategory(Analytics.CATEGORY_SETTINGS)
-          .setAction(Analytics.ACTION_CHANGE_VIDEO_SIZE)
-          .setValue(newValue)
-          .build());
+      analytics.send(Analytics.EVENT_CHANGE_VIDEO_SIZE + newValue);
     }
   }
 
@@ -116,11 +111,7 @@ public final class TelecineActivity extends AppCompatActivity {
       Timber.d("Hide show countdown changing to %s", newValue);
       showCountdownPreference.set(newValue);
 
-      analytics.send(new HitBuilders.EventBuilder() //
-          .setCategory(Analytics.CATEGORY_SETTINGS)
-          .setAction(Analytics.ACTION_CHANGE_SHOW_COUNTDOWN)
-          .setValue(newValue ? 1 : 0)
-          .build());
+      analytics.send(newValue ? Analytics.EVENT_CHANGE_SHOW_COUNTDOWN_YES : Analytics.EVENT_CHANGE_SHOW_COUNTDOWN_NO);
     }
   }
 
@@ -131,11 +122,7 @@ public final class TelecineActivity extends AppCompatActivity {
       Timber.d("Hide from recents preference changing to %s", newValue);
       hideFromRecentsPreference.set(newValue);
 
-      analytics.send(new HitBuilders.EventBuilder() //
-          .setCategory(Analytics.CATEGORY_SETTINGS)
-          .setAction(Analytics.ACTION_CHANGE_HIDE_RECENTS)
-          .setValue(newValue ? 1 : 0)
-          .build());
+      analytics.send(newValue ? Analytics.EVENT_CHANGE_HIDE_RECENTS_YES : Analytics.EVENT_CHANGE_HIDE_RECENTS_NO);
     }
   }
 
@@ -146,11 +133,7 @@ public final class TelecineActivity extends AppCompatActivity {
       Timber.d("Recording notification preference changing to %s", newValue);
       recordingNotificationPreference.set(newValue);
 
-      analytics.send(new HitBuilders.EventBuilder() //
-          .setCategory(Analytics.CATEGORY_SETTINGS)
-          .setAction(Analytics.ACTION_CHANGE_RECORDING_NOTIFICATION)
-          .setValue(newValue ? 1 : 0)
-          .build());
+      analytics.send(newValue ? Analytics.EVENT_CHANGE_RECORDING_NOTIFICATION_YES : Analytics.EVENT_CHANGE_RECORDING_NOTIFICATION_NO);
     }
   }
 
@@ -161,11 +144,7 @@ public final class TelecineActivity extends AppCompatActivity {
       Timber.d("Show touches preference changing to %s", newValue);
       showTouchesPreference.set(newValue);
 
-      analytics.send(new HitBuilders.EventBuilder() //
-          .setCategory(Analytics.CATEGORY_SETTINGS)
-          .setAction(Analytics.ACTION_CHANGE_SHOW_TOUCHES)
-          .setValue(newValue ? 1 : 0)
-          .build());
+      analytics.send(newValue ? Analytics.EVENT_CHANGE_SHOW_TOUCHES_YES : Analytics.EVENT_CHANGE_SHOW_TOUCHES_NO);
     }
   }
 
