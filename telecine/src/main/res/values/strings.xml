@@ -24,6 +24,12 @@
   <string name="notification_recording_subtitle">Touch the clock area to stop recording.</string>
   <string name="recording_notification">Recording Notification</string>
   <string name="show_touches">Show Touches</string>
+  <string name="static_shortcut_record_short_label">Record</string>
+  <string name="static_shortcut_record_long_label">Start recording</string>
+  <string name="static_shortcut_record_disabled_message">@string/static_shortcut_record_short_label</string>
+  <string name="static_shortcut_overlay_short_label">Overlay</string>
+  <string name="static_shortcut_overlay_long_label">Show overlay</string>
+  <string name="static_shortcut_overlay_disabled_message">@string/static_shortcut_overlay_short_label</string>
 
   <array name="countdown">
     <item>@string/countdown_three</item>
