@@ -4,7 +4,6 @@ import android.annotation.TargetApi;
 import android.os.Build;
 import android.service.quicksettings.Tile;
 import android.service.quicksettings.TileService;
-import com.google.android.gms.analytics.HitBuilders;
 import javax.inject.Inject;
 import timber.log.Timber;
 
@@ -34,17 +33,11 @@ public final class TelecineTileService extends TileService {
 
   @Override public void onTileAdded() {
     Timber.i("Quick tile added");
-    analytics.send(new HitBuilders.EventBuilder() //
-        .setCategory(Analytics.CATEGORY_QUICK_TILE)
-        .setAction(Analytics.ACTION_QUICK_TILE_ADDED)
-        .build());
+    analytics.send(Analytics.EVENT_QUICK_TILE_ADDED);
   }
 
   @Override public void onTileRemoved() {
     Timber.i("Quick tile removed");
-    analytics.send(new HitBuilders.EventBuilder() //
-        .setCategory(Analytics.CATEGORY_QUICK_TILE)
-        .setAction(Analytics.ACTION_QUICK_TILE_ADDED)
-        .build());
+    analytics.send(Analytics.EVENT_QUICK_TILE_REMOVED);
   }
 }
