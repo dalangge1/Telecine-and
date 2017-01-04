@@ -2,9 +2,6 @@
 <resources>
   <string name="clear">Убрать</string>
   <string name="countdown">Обратный отсчет (3 сек)</string>
-  <string name="countdown_one">1…</string>
-  <string name="countdown_two">2…</string>
-  <string name="countdown_three">3…</string>
   <string name="launch_overlay">Запустить в области уведомлений</string>
   <string name="notification_captured_share">Поделиться</string>
   <string name="notification_captured_subtitle">Нажмите, чтобы просмотреть видео.</string>
