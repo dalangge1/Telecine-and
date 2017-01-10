@@ -5,9 +5,6 @@
   <string name="shortcut_name">Avvia</string>
   <string name="clear">Clear</string>
   <string name="record">Registra</string>
-  <string name="countdown_one">1…</string>
-  <string name="countdown_two">2…</string>
-  <string name="countdown_three">3…</string>
   <string name="launch_overlay">Avvia Overlay</string>
   <string name="preferences">Preferenze</string>
   <string name="countdown">Conto alla rovescia di tre secondi</string>

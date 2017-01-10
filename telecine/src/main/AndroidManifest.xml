@@ -19,6 +19,7 @@
       android:name=".TelecineApplication"
       android:theme="@style/Theme.Telecine"
       android:supportsRtl="true"
+      tools:ignore="AllowBackup,GoogleAppIndexingWarning"
       >
     <activity android:name=".TelecineActivity">
       <intent-filter>

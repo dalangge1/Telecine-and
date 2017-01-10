@@ -4,9 +4,6 @@
   <string name="shortcut_name">Lancer</string>
   <string name="clear">Effacer</string>
   <string name="record">Enregistrer</string>
-  <string name="countdown_one">1…</string>
-  <string name="countdown_two">2…</string>
-  <string name="countdown_three">3…</string>
   <string name="launch_overlay">Lancer le calque</string>
   <string name="preferences">Paramètres</string>
   <string name="countdown">Compte à rebours de 3 secondes</string>

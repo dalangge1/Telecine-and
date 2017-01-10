@@ -8,9 +8,9 @@
   <string name="tile_name">Launch Telecine</string>
   <string name="clear">Clear</string>
   <string name="record">Record</string>
-  <string name="countdown_one">1…</string>
-  <string name="countdown_two">2…</string>
-  <string name="countdown_three">3…</string>
+  <string name="countdown_one" translatable="false">1…</string>
+  <string name="countdown_two" translatable="false">2…</string>
+  <string name="countdown_three" translatable="false">3…</string>
   <string name="launch_overlay">Launch Overlay</string>
   <string name="preferences">Preferences</string>
   <string name="countdown">Three second countdown</string>

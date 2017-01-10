@@ -1,5 +1,6 @@
 package com.jakewharton.telecine;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
@@ -41,6 +42,7 @@ final class VideoSizePercentageAdapter extends BaseAdapter {
     return position;
   }
 
+  @SuppressLint("SetTextI18n")
   @Override public View getView(int position, View convertView, @NonNull ViewGroup parent) {
     TextView tv = (TextView) convertView;
     if (tv == null) {

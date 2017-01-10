@@ -3,9 +3,6 @@
   <string name="shortcut_name">Iniciar</string>
   <string name="clear">Limpar</string>
   <string name="record">Gravar</string>
-  <string name="countdown_one">1…</string>
-  <string name="countdown_two">2…</string>
-  <string name="countdown_three">3…</string>
   <string name="launch_overlay">Iniciar Gravação</string>
   <string name="preferences">Configurações</string>
   <string name="countdown">Contador de três segundos</string>
