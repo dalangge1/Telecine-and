@@ -222,6 +222,7 @@ final class RecordingSession {
     recorder.setVideoEncoder(H264);
     recorder.setVideoSize(recordingInfo.width, recordingInfo.height);
     recorder.setVideoEncodingBitRate(8 * 1000 * 1000);
+    recorder.setCaptureRate(60);
 
     String outputName = fileFormat.format(new Date());
     outputFile = new File(outputRoot, outputName).getAbsolutePath();
