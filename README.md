@@ -1,3 +1,5 @@
+[![TravisCI](https://travis-ci.org/JakeWharton/Telecine.svg?branch=master)](https://travis-ci.org/JakeWharton/Telecine)
+
 [![Telecine](art/feature.png)][1]
 
 [![Get it on Google Play](art/en-play-badge.png)][1]
