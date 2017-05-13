@@ -22,6 +22,11 @@ public final class TelecineShortcutLaunchActivity extends Activity {
     super.onCreate(savedInstanceState);
     ((TelecineApplication) getApplication()).injector().inject(this);
 
+    if (!DrawOverlayHelper.hasPermission(this)) {
+      DrawOverlayHelper.requestPermission(this);
+      return;
+    }
+
     String launchAction = getIntent().getStringExtra(KEY_ACTION);
     if (launchAction == null) {
       launchAction = Analytics.ACTION_SHORTCUT_LAUNCHED;
@@ -36,7 +41,8 @@ public final class TelecineShortcutLaunchActivity extends Activity {
   }
 
   @Override protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-    if (!CaptureHelper.handleActivityResult(this, requestCode, resultCode, data, analytics)) {
+    if (!CaptureHelper.handleActivityResult(this, requestCode, resultCode, data, analytics)
+            && !DrawOverlayHelper.handleActivityResult(this, requestCode, analytics)) {
       super.onActivityResult(requestCode, resultCode, data);
     }
     finish();

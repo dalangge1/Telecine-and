@@ -107,6 +107,10 @@ public final class TelecineActivity extends AppCompatActivity {
   }
 
   @OnClick(R.id.launch) void onLaunchClicked() {
+    if (!DrawOverlayHelper.hasPermission(this)) {
+      DrawOverlayHelper.requestPermission(this);
+      return;
+    }
     Timber.d("Attempting to acquire permission to screen capture.");
     CaptureHelper.fireScreenCaptureIntent(this, analytics);
   }
@@ -204,7 +208,8 @@ public final class TelecineActivity extends AppCompatActivity {
 
   @Override protected void onActivityResult(int requestCode, int resultCode, Intent data) {
     if (!CaptureHelper.handleActivityResult(this, requestCode, resultCode, data, analytics)
-        && !DemoModeHelper.handleActivityResult(this, requestCode, showDemoModeSetting)) {
+        && !DemoModeHelper.handleActivityResult(this, requestCode, showDemoModeSetting)
+            && !DrawOverlayHelper.handleActivityResult(this, requestCode, analytics)) {
       super.onActivityResult(requestCode, resultCode, data);
     }
   }
