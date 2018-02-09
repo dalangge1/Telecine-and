@@ -3,13 +3,17 @@ package com.jakewharton.telecine;
 import android.app.Application;
 import android.content.ContentResolver;
 import android.content.SharedPreferences;
+
 import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.analytics.Tracker;
+
+import java.util.Map;
+
+import javax.inject.Singleton;
+
 import dagger.Module;
 import dagger.Provides;
 import dagger.android.ContributesAndroidInjector;
-import java.util.Map;
-import javax.inject.Singleton;
 import timber.log.Timber;
 
 import static android.content.Context.MODE_PRIVATE;
@@ -109,5 +113,4 @@ import static android.content.Context.MODE_PRIVATE;
 
   @ContributesAndroidInjector abstract TelecineService contributeTelecineService();
 
-  @ContributesAndroidInjector abstract TelecineTileService contributeTelecineTileService();
 }
