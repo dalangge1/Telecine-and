@@ -3,9 +3,11 @@ package com.jakewharton.telecine;
 import android.annotation.TargetApi;
 import android.service.quicksettings.Tile;
 import android.service.quicksettings.TileService;
+
 import com.google.android.gms.analytics.HitBuilders;
-import dagger.android.AndroidInjection;
+
 import javax.inject.Inject;
+
 import timber.log.Timber;
 
 import static android.os.Build.VERSION_CODES.N;
@@ -15,7 +17,7 @@ public final class TelecineTileService extends TileService {
   @Inject Analytics analytics;
 
   @Override public void onCreate() {
-    AndroidInjection.inject(this);
+    ((TelecineApplication) getApplication()).telecineComponent().api24OrGreaterServiceComponent().injector().inject(this);
     super.onCreate();
   }
 
