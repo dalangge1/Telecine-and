@@ -10,6 +10,8 @@ import javax.inject.Singleton;
 interface TelecineComponent {
   void inject(TelecineApplication app);
 
+  TelecineTileService.Component telecineTileServiceComponent();
+
   @Component.Builder interface Builder {
     @BindsInstance Builder application(Application application);
 

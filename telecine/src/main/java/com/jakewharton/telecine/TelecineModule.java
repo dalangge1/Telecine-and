@@ -108,6 +108,4 @@ import static android.content.Context.MODE_PRIVATE;
   abstract TelecineShortcutLaunchActivity contributeTelecineShortcutLaunchActivity();
 
   @ContributesAndroidInjector abstract TelecineService contributeTelecineService();
-
-  @ContributesAndroidInjector abstract TelecineTileService contributeTelecineTileService();
 }
