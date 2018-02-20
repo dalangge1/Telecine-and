@@ -24,7 +24,7 @@ public final class TelecineApplication extends Application
   @Override public void onCreate() {
     TelecineComponent component = DaggerTelecineComponent.builder().application(this).build();
     if (SDK_INT >= N) {
-      component.telecineTileServiceComponent().inject(this);
+      component.for24Plus().inject(this);
     } else {
       component.inject(this);
     }

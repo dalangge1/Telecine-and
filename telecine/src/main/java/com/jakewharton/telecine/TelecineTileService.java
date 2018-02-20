@@ -1,14 +1,10 @@
 package com.jakewharton.telecine;
 
 import android.annotation.TargetApi;
-import android.app.Service;
 import android.service.quicksettings.Tile;
 import android.service.quicksettings.TileService;
 import com.google.android.gms.analytics.HitBuilders;
-import dagger.Subcomponent;
 import dagger.android.AndroidInjection;
-import dagger.android.ContributesAndroidInjector;
-import dagger.android.DispatchingAndroidInjector;
 import javax.inject.Inject;
 import timber.log.Timber;
 
@@ -52,17 +48,5 @@ public final class TelecineTileService extends TileService {
         .setCategory(Analytics.CATEGORY_QUICK_TILE)
         .setAction(Analytics.ACTION_QUICK_TILE_REMOVED)
         .build());
-  }
-
-  @Subcomponent(modules = Module.class)
-  interface Component {
-    void inject(TelecineApplication app);
-
-    DispatchingAndroidInjector<Service> injector();
-  }
-
-  @dagger.Module
-  abstract class Module {
-    @ContributesAndroidInjector abstract TelecineTileService contributeTelecineTileService();
   }
 }
