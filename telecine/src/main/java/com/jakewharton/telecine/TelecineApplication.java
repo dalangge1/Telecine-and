@@ -13,13 +13,21 @@ import dagger.android.HasServiceInjector;
 import javax.inject.Inject;
 import timber.log.Timber;
 
+import static android.os.Build.VERSION.SDK_INT;
+import static android.os.Build.VERSION_CODES.N;
+
 public final class TelecineApplication extends Application
     implements HasActivityInjector, HasServiceInjector {
   @Inject DispatchingAndroidInjector<Activity> dispatchingActivityInjector;
   @Inject DispatchingAndroidInjector<Service> dispatchingServiceInjector;
 
   @Override public void onCreate() {
-    DaggerTelecineComponent.builder().application(this).build().inject(this);
+    TelecineComponent component = DaggerTelecineComponent.builder().application(this).build();
+    if (SDK_INT >= N) {
+      component.for24Plus().inject(this);
+    } else {
+      component.inject(this);
+    }
     super.onCreate();
 
     if (BuildConfig.DEBUG) {
